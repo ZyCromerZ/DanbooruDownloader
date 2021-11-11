@@ -19,7 +19,7 @@ namespace DanbooruDownloader.Commands
     {
         static Logger Log = LogManager.GetCurrentClassLogger();
 
-        public static async Task Run(string path, long startId, int parallelDownloads, bool ignoreHashCheck, bool includeDeleted)
+        public static async Task Run(string path, long startId, long endId, int parallelDownloads, bool ignoreHashCheck, bool includeDeleted)
         {
             string tempFolderPath = Path.Combine(path, "_temp");
             string imageFolderPath = Path.Combine(path, "images");
@@ -64,7 +64,15 @@ namespace DanbooruDownloader.Commands
 
                     // Validate post
                     Log.Info($"Checking {postJObjects.Length} posts ...");
-                    Post[] posts = postJObjects.Select(p => ConvertToPost(p)).Where(p => p != null).ToArray();
+                    Post[] posts = postJObjects.Select(p => ConvertToPost(p))
+                        .Where(p => p != null && (endId <= 0 || long.Parse(p.Id) <= endId))
+                        .ToArray();
+
+                    if (posts.Length == 0)
+                    {
+                        Log.Info("There is no valid posts.");
+                        break;
+                    }
 
                     Parallel.ForEach(posts, post =>
                     {
