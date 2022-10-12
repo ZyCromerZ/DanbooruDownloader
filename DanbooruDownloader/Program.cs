@@ -29,10 +29,12 @@ namespace DanbooruDownloader
                 var parallelDownloadsOption = command.Option("-p|--parallel-downloads <value>", "Number of images to download simultaneously. Default is 5.", CommandOptionType.SingleValue);
                 var ignoreHashCheckOption = command.Option("-i|--ignore-hash-check", "Ignore hash check.", CommandOptionType.NoValue);
                 var includeDeletedOption = command.Option("-d|--deleted", "Include deleted posts.", CommandOptionType.NoValue);
+                var customtags = command.Argument("tags", "Custom Tags", false);
 
                 command.OnExecute(() =>
                 {
                     string path = outputPathArgument.Value;
+                    string ctags = customtags.Value;
                     long startId = 1;
                     long endId = 0;
                     int parallelDownloads = 5;
@@ -56,7 +58,7 @@ namespace DanbooruDownloader
                         return -2;
                     }
 
-                    DumpCommand.Run(path, startId, endId, parallelDownloads, ignoreHashCheck, includeDeleted).Wait();
+                    DumpCommand.Run(path, startId, endId, parallelDownloads, ignoreHashCheck, includeDeleted, ctags).Wait();
 
                     return 0;
                 });
